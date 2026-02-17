@@ -35,5 +35,18 @@ RSpec.describe Stega::Sanity do
       expect(decoded["origin"]).to eq("sanity.io")
       expect(decoded["href"]).to include("doc1")
     end
+
+    it "skips URL values by default" do
+      result = { "url" => "https://example.com" }
+      source_map = {
+        "documents" => [{ "_id" => "doc1", "_type" => "post" }],
+        "paths" => ["url"],
+        "mappings" => { "url" => { "source" => { "document" => 0, "path" => 0 } } }
+      }
+      config = { enabled: true, studio_url: "https://studio.sanity.io" }
+
+      encoded = Stega::Sanity.encode_source_map(result, source_map, config)
+      expect(encoded["url"]).to eq("https://example.com")
+    end
   end
 end
