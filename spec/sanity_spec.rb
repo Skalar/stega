@@ -102,5 +102,21 @@ RSpec.describe Stega::Sanity do
       expect(decoded["href"]).to include("projectId=proj123")
       expect(decoded["href"]).to include("dataset=production")
     end
+
+    it "omits dataset/projectId when omit_cross_dataset_reference_data is true" do
+      result = { "title" => "Hello" }
+      source_map = {
+        "documents" => [{ "_id" => "doc1", "_type" => "post", "_projectId" => "proj123", "_dataset" => "production" }],
+        "paths" => ["title"],
+        "mappings" => { "title" => { "source" => { "document" => 0, "path" => 0 } } }
+      }
+      config = { enabled: true, studio_url: "https://studio.sanity.io", omit_cross_dataset_reference_data: true }
+
+      encoded = Stega::Sanity.encode_source_map(result, source_map, config)
+      decoded = Stega.decode(encoded["title"])
+
+      expect(decoded["href"]).not_to include("projectId")
+      expect(decoded["href"]).not_to include("dataset")
+    end
   end
 end

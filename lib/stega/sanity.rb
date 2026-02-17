@@ -50,7 +50,8 @@ module Stega
           edit_url = create_edit_url(
             studio_url: config[:studio_url],
             document: document,
-            path: paths[path_index]
+            path: paths[path_index],
+            omit_cross_dataset: config[:omit_cross_dataset_reference_data]
           )
 
           payload = { "origin" => "sanity.io", "href" => edit_url }
