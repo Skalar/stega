@@ -67,5 +67,24 @@ RSpec.describe Stega::Sanity do
       expect(encoded["title"]).to eq("skip-me")
       expect(Stega.decode(encoded["other"])).to include("origin" => "sanity.io")
     end
+
+    it "creates edit URLs with document metadata" do
+      result = { "title" => "Hello" }
+      source_map = {
+        "documents" => [{ "_id" => "doc123", "_type" => "article" }],
+        "paths" => ["content.title"],
+        "mappings" => { "title" => { "source" => { "document" => 0, "path" => 0 } } }
+      }
+      config = { enabled: true, studio_url: "https://my-studio.sanity.studio" }
+
+      encoded = Stega::Sanity.encode_source_map(result, source_map, config)
+      decoded = Stega.decode(encoded["title"])
+
+      expect(decoded["href"]).to include("my-studio.sanity.studio")
+      expect(decoded["href"]).to include("intent/edit")
+      expect(decoded["href"]).to include("id=doc123")
+      expect(decoded["href"]).to include("type=article")
+      expect(decoded["href"]).to include("path=content.title")
+    end
   end
 end
