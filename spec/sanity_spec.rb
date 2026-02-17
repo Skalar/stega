@@ -13,5 +13,11 @@ RSpec.describe Stega::Sanity do
       result = { "title" => "Hello" }
       expect(Stega::Sanity.encode_source_map(result, nil, config)).to eq(result)
     end
+
+    it "raises TypeError when studio_url is not defined" do
+      config = { enabled: true }
+      expect { Stega::Sanity.encode_source_map({}, {}, config) }
+        .to raise_error(TypeError, /studio_url must be defined/)
+    end
   end
 end

@@ -14,6 +14,7 @@ module Stega
 
       def validate_config!(config)
         raise TypeError, "enabled must be true" unless config[:enabled]
+        raise TypeError, "studio_url must be defined" unless config[:studio_url]
       end
     end
   end
