@@ -118,5 +118,21 @@ RSpec.describe Stega::Sanity do
       expect(decoded["href"]).not_to include("projectId")
       expect(decoded["href"]).not_to include("dataset")
     end
+
+    it "encodes strings in nested objects" do
+      result = { "author" => { "name" => "John" } }
+      source_map = {
+        "documents" => [{ "_id" => "doc1", "_type" => "post" }],
+        "paths" => ["author.name"],
+        "mappings" => { "author.name" => { "source" => { "document" => 0, "path" => 0 } } }
+      }
+      config = { enabled: true, studio_url: "https://studio.sanity.io" }
+
+      encoded = Stega::Sanity.encode_source_map(result, source_map, config)
+      decoded = Stega.decode(encoded["author"]["name"])
+
+      expect(decoded["origin"]).to eq("sanity.io")
+      expect(decoded["href"]).to include("doc1")
+    end
   end
 end
