@@ -73,17 +73,21 @@ module Stega
         end
       end
 
-      def create_edit_url(studio_url:, document:, path:)
+      def create_edit_url(studio_url:, document:, path:, omit_cross_dataset: false)
         doc_id = document["_id"]
         doc_type = document["_type"]
+        project_id = document["_projectId"]
+        dataset = document["_dataset"]
 
         base = resolve_studio_base_route(studio_url)
-        params = URI.encode_www_form(
-          id: doc_id,
-          type: doc_type,
-          path: path
-        )
 
+        params_hash = { id: doc_id, type: doc_type, path: path }
+        unless omit_cross_dataset
+          params_hash[:projectId] = project_id if project_id
+          params_hash[:dataset] = dataset if dataset
+        end
+
+        params = URI.encode_www_form(params_hash)
         "#{base[:base_url]}/intent/edit?#{params}"
       end
 

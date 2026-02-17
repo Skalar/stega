@@ -86,5 +86,21 @@ RSpec.describe Stega::Sanity do
       expect(decoded["href"]).to include("type=article")
       expect(decoded["href"]).to include("path=content.title")
     end
+
+    it "includes dataset and projectId by default" do
+      result = { "title" => "Hello" }
+      source_map = {
+        "documents" => [{ "_id" => "doc1", "_type" => "post", "_projectId" => "proj123", "_dataset" => "production" }],
+        "paths" => ["title"],
+        "mappings" => { "title" => { "source" => { "document" => 0, "path" => 0 } } }
+      }
+      config = { enabled: true, studio_url: "https://studio.sanity.io" }
+
+      encoded = Stega::Sanity.encode_source_map(result, source_map, config)
+      decoded = Stega.decode(encoded["title"])
+
+      expect(decoded["href"]).to include("projectId=proj123")
+      expect(decoded["href"]).to include("dataset=production")
+    end
   end
 end
