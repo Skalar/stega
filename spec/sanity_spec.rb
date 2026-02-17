@@ -134,5 +134,28 @@ RSpec.describe Stega::Sanity do
       expect(decoded["origin"]).to eq("sanity.io")
       expect(decoded["href"]).to include("doc1")
     end
+
+    it "encodes strings in arrays" do
+      result = { "tags" => ["ruby", "javascript"] }
+      source_map = {
+        "documents" => [{ "_id" => "doc1", "_type" => "post" }],
+        "paths" => ["tags[0]", "tags[1]"],
+        "mappings" => {
+          "tags.0" => { "source" => { "document" => 0, "path" => 0 } },
+          "tags.1" => { "source" => { "document" => 0, "path" => 1 } }
+        }
+      }
+      config = { enabled: true, studio_url: "https://studio.sanity.io" }
+
+      encoded = Stega::Sanity.encode_source_map(result, source_map, config)
+
+      decoded0 = Stega.decode(encoded["tags"][0])
+      decoded1 = Stega.decode(encoded["tags"][1])
+
+      expect(decoded0["origin"]).to eq("sanity.io")
+      expect(decoded0["href"]).to include("tags%5B0%5D") # URL-encoded [0]
+      expect(decoded1["origin"]).to eq("sanity.io")
+      expect(decoded1["href"]).to include("tags%5B1%5D") # URL-encoded [1]
+    end
   end
 end
