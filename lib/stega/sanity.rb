@@ -23,13 +23,14 @@ module Stega
         mappings = source_map["mappings"] || {}
 
         deep_transform(result, []) do |value, path|
-          path_key = path.join(".")
-          mapping = mappings[path_key]
+          json_path = to_json_path(path)
+          mapping = mappings[json_path]
 
           next value unless mapping && value.is_a?(String)
+          next value unless mapping["type"] == "value"
 
           source = mapping["source"]
-          next value unless source
+          next value unless source && source["type"] == "documentValue"
 
           doc_index = source["document"]
           path_index = source["path"]
@@ -67,7 +68,7 @@ module Stega
           end
         when Array
           obj.each_with_index.map do |value, index|
-            deep_transform(value, path + [index.to_s], &block)
+            deep_transform(value, path + [index], &block)
           end
         else
           yield(obj, path)
@@ -95,6 +96,17 @@ module Stega
       def resolve_studio_base_route(studio_url)
         uri = URI.parse(studio_url)
         { base_url: "#{uri.scheme}://#{uri.host}" }
+      end
+
+      def to_json_path(path)
+        json_path = path.map do |segment|
+          if segment.is_a?(Integer) || segment =~ /^\d+$/
+            "[#{segment}]"
+          else
+            "['#{segment}']"
+          end
+        end.join("")
+        "$#{json_path}"
       end
     end
   end

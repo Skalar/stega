@@ -20,7 +20,32 @@ module Stega
         run_js("legacyStegaEncode", value)
       end
 
+      def sanity_encode_source_map(result, source_map, config)
+        js_config = convert_config_to_js(config)
+        script = <<~JS
+          const { stegaEncodeSourceMap } = require('@sanity/client/stega');
+          const result = #{JSON.generate(result)};
+          const sourceMap = #{JSON.generate(source_map)};
+          const config = #{JSON.generate(js_config)};
+          const encoded = stegaEncodeSourceMap(result, sourceMap, config);
+          console.log(JSON.stringify(encoded));
+        JS
+        stdout, status = Open3.capture2("node", "-e", script)
+        raise "Node.js error: #{stdout}" unless status.success?
+        JSON.parse(stdout.strip)
+      end
+
       private
+
+      def convert_config_to_js(config)
+        js_config = {}
+        js_config["enabled"] = config[:enabled] if config.key?(:enabled)
+        js_config["studioUrl"] = config[:studio_url] if config.key?(:studio_url)
+        if config.key?(:omit_cross_dataset_reference_data)
+          js_config["omitCrossDatasetReferenceData"] = config[:omit_cross_dataset_reference_data]
+        end
+        js_config
+      end
 
       def run_js(fn, arg)
         script = <<~JS

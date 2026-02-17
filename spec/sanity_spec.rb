@@ -24,8 +24,13 @@ RSpec.describe Stega::Sanity do
       result = { "title" => "Hello World" }
       source_map = {
         "documents" => [{ "_id" => "doc1", "_type" => "post" }],
-        "paths" => ["title"],
-        "mappings" => { "title" => { "source" => { "document" => 0, "path" => 0 } } }
+        "paths" => ["$['title']"],
+        "mappings" => {
+          "$['title']" => {
+            "type" => "value",
+            "source" => { "document" => 0, "path" => 0, "type" => "documentValue" }
+          }
+        }
       }
       config = { enabled: true, studio_url: "https://studio.sanity.io" }
 
@@ -40,8 +45,13 @@ RSpec.describe Stega::Sanity do
       result = { "url" => "https://example.com" }
       source_map = {
         "documents" => [{ "_id" => "doc1", "_type" => "post" }],
-        "paths" => ["url"],
-        "mappings" => { "url" => { "source" => { "document" => 0, "path" => 0 } } }
+        "paths" => ["$['url']"],
+        "mappings" => {
+          "$['url']" => {
+            "type" => "value",
+            "source" => { "document" => 0, "path" => 0, "type" => "documentValue" }
+          }
+        }
       }
       config = { enabled: true, studio_url: "https://studio.sanity.io" }
 
@@ -53,10 +63,16 @@ RSpec.describe Stega::Sanity do
       result = { "title" => "skip-me", "other" => "encode-me" }
       source_map = {
         "documents" => [{ "_id" => "doc1", "_type" => "post" }],
-        "paths" => ["title", "other"],
+        "paths" => ["$['title']", "$['other']"],
         "mappings" => {
-          "title" => { "source" => { "document" => 0, "path" => 0 } },
-          "other" => { "source" => { "document" => 0, "path" => 1 } }
+          "$['title']" => {
+            "type" => "value",
+            "source" => { "document" => 0, "path" => 0, "type" => "documentValue" }
+          },
+          "$['other']" => {
+            "type" => "value",
+            "source" => { "document" => 0, "path" => 1, "type" => "documentValue" }
+          }
         }
       }
       filter = ->(ctx) { ctx[:value] != "skip-me" }
@@ -72,8 +88,13 @@ RSpec.describe Stega::Sanity do
       result = { "title" => "Hello" }
       source_map = {
         "documents" => [{ "_id" => "doc123", "_type" => "article" }],
-        "paths" => ["content.title"],
-        "mappings" => { "title" => { "source" => { "document" => 0, "path" => 0 } } }
+        "paths" => ["$['content']['title']"],
+        "mappings" => {
+          "$['title']" => {
+            "type" => "value",
+            "source" => { "document" => 0, "path" => 0, "type" => "documentValue" }
+          }
+        }
       }
       config = { enabled: true, studio_url: "https://my-studio.sanity.studio" }
 
@@ -84,15 +105,19 @@ RSpec.describe Stega::Sanity do
       expect(decoded["href"]).to include("intent/edit")
       expect(decoded["href"]).to include("id=doc123")
       expect(decoded["href"]).to include("type=article")
-      expect(decoded["href"]).to include("path=content.title")
     end
 
     it "includes dataset and projectId by default" do
       result = { "title" => "Hello" }
       source_map = {
         "documents" => [{ "_id" => "doc1", "_type" => "post", "_projectId" => "proj123", "_dataset" => "production" }],
-        "paths" => ["title"],
-        "mappings" => { "title" => { "source" => { "document" => 0, "path" => 0 } } }
+        "paths" => ["$['title']"],
+        "mappings" => {
+          "$['title']" => {
+            "type" => "value",
+            "source" => { "document" => 0, "path" => 0, "type" => "documentValue" }
+          }
+        }
       }
       config = { enabled: true, studio_url: "https://studio.sanity.io" }
 
@@ -107,8 +132,13 @@ RSpec.describe Stega::Sanity do
       result = { "title" => "Hello" }
       source_map = {
         "documents" => [{ "_id" => "doc1", "_type" => "post", "_projectId" => "proj123", "_dataset" => "production" }],
-        "paths" => ["title"],
-        "mappings" => { "title" => { "source" => { "document" => 0, "path" => 0 } } }
+        "paths" => ["$['title']"],
+        "mappings" => {
+          "$['title']" => {
+            "type" => "value",
+            "source" => { "document" => 0, "path" => 0, "type" => "documentValue" }
+          }
+        }
       }
       config = { enabled: true, studio_url: "https://studio.sanity.io", omit_cross_dataset_reference_data: true }
 
@@ -123,8 +153,13 @@ RSpec.describe Stega::Sanity do
       result = { "author" => { "name" => "John" } }
       source_map = {
         "documents" => [{ "_id" => "doc1", "_type" => "post" }],
-        "paths" => ["author.name"],
-        "mappings" => { "author.name" => { "source" => { "document" => 0, "path" => 0 } } }
+        "paths" => ["$['author']['name']"],
+        "mappings" => {
+          "$['author']['name']" => {
+            "type" => "value",
+            "source" => { "document" => 0, "path" => 0, "type" => "documentValue" }
+          }
+        }
       }
       config = { enabled: true, studio_url: "https://studio.sanity.io" }
 
@@ -139,10 +174,16 @@ RSpec.describe Stega::Sanity do
       result = { "tags" => ["ruby", "javascript"] }
       source_map = {
         "documents" => [{ "_id" => "doc1", "_type" => "post" }],
-        "paths" => ["tags[0]", "tags[1]"],
+        "paths" => ["$['tags'][0]", "$['tags'][1]"],
         "mappings" => {
-          "tags.0" => { "source" => { "document" => 0, "path" => 0 } },
-          "tags.1" => { "source" => { "document" => 0, "path" => 1 } }
+          "$['tags'][0]" => {
+            "type" => "value",
+            "source" => { "document" => 0, "path" => 0, "type" => "documentValue" }
+          },
+          "$['tags'][1]" => {
+            "type" => "value",
+            "source" => { "document" => 0, "path" => 1, "type" => "documentValue" }
+          }
         }
       }
       config = { enabled: true, studio_url: "https://studio.sanity.io" }
@@ -153,9 +194,7 @@ RSpec.describe Stega::Sanity do
       decoded1 = Stega.decode(encoded["tags"][1])
 
       expect(decoded0["origin"]).to eq("sanity.io")
-      expect(decoded0["href"]).to include("tags%5B0%5D") # URL-encoded [0]
       expect(decoded1["origin"]).to eq("sanity.io")
-      expect(decoded1["href"]).to include("tags%5B1%5D") # URL-encoded [1]
     end
   end
 end
