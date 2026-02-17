@@ -48,5 +48,24 @@ RSpec.describe Stega::Sanity do
       encoded = Stega::Sanity.encode_source_map(result, source_map, config)
       expect(encoded["url"]).to eq("https://example.com")
     end
+
+    it "uses custom filter when provided" do
+      result = { "title" => "skip-me", "other" => "encode-me" }
+      source_map = {
+        "documents" => [{ "_id" => "doc1", "_type" => "post" }],
+        "paths" => ["title", "other"],
+        "mappings" => {
+          "title" => { "source" => { "document" => 0, "path" => 0 } },
+          "other" => { "source" => { "document" => 0, "path" => 1 } }
+        }
+      }
+      filter = ->(ctx) { ctx[:value] != "skip-me" }
+      config = { enabled: true, studio_url: "https://studio.sanity.io", filter: filter }
+
+      encoded = Stega::Sanity.encode_source_map(result, source_map, config)
+
+      expect(encoded["title"]).to eq("skip-me")
+      expect(Stega.decode(encoded["other"])).to include("origin" => "sanity.io")
+    end
   end
 end

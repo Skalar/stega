@@ -37,6 +37,16 @@ module Stega
 
           next value unless document
 
+          context = {
+            value: value,
+            path: path,
+            document: document
+          }
+
+          if config[:filter]
+            next value unless config[:filter].call(context)
+          end
+
           edit_url = create_edit_url(
             studio_url: config[:studio_url],
             document: document,
