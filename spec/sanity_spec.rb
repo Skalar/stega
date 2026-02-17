@@ -19,5 +19,21 @@ RSpec.describe Stega::Sanity do
       expect { Stega::Sanity.encode_source_map({}, {}, config) }
         .to raise_error(TypeError, /studio_url must be defined/)
     end
+
+    it "encodes string values from source map" do
+      result = { "title" => "Hello World" }
+      source_map = {
+        "documents" => [{ "_id" => "doc1", "_type" => "post" }],
+        "paths" => ["title"],
+        "mappings" => { "title" => { "source" => { "document" => 0, "path" => 0 } } }
+      }
+      config = { enabled: true, studio_url: "https://studio.sanity.io" }
+
+      encoded = Stega::Sanity.encode_source_map(result, source_map, config)
+      decoded = Stega.decode(encoded["title"])
+
+      expect(decoded["origin"]).to eq("sanity.io")
+      expect(decoded["href"]).to include("doc1")
+    end
   end
 end
