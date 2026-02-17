@@ -5,6 +5,8 @@ module Stega
     class << self
       def encode_source_map(result, source_map, config)
         validate_config!(config)
+        return result unless source_map
+
         result
       end
 

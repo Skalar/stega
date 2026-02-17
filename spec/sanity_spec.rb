@@ -7,5 +7,11 @@ RSpec.describe Stega::Sanity do
       expect { Stega::Sanity.encode_source_map({}, {}, config) }
         .to raise_error(TypeError, /enabled must be true/)
     end
+
+    it "returns result unchanged when source_map is nil" do
+      config = { enabled: true, studio_url: "https://studio.sanity.io" }
+      result = { "title" => "Hello" }
+      expect(Stega::Sanity.encode_source_map(result, nil, config)).to eq(result)
+    end
   end
 end
