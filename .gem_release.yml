@@ -1,0 +1,4 @@
+bump:
+  file: lib/stega/version.rb
+  skip_ci: true
+
