@@ -10,6 +10,7 @@ require "stega/encoder"
 require "stega/legacy_encoder"
 require "stega/decoder"
 require "stega/js_bridge"
+require "stega/sanity"
 
 module Stega
   # Regex to match encoded strings
