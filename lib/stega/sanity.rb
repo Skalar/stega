@@ -24,7 +24,7 @@ module Stega
 
         deep_transform(result, []) do |value, path|
           json_path = to_json_path(path)
-          mapping = mappings[json_path]
+          mapping, matched_path = resolve_mapping(json_path, mappings)
 
           next value unless mapping && value.is_a?(String)
           next value unless (mapping["type"] || mapping[:type] || "value") == "value"
@@ -48,10 +48,13 @@ module Stega
             next value unless config[:filter].call(context)
           end
 
+          source_path = paths[path_index]
+          full_path = resolve_full_source_path(source_path, json_path, matched_path)
+
           edit_url = create_edit_url(
             studio_url: config[:studio_url],
             document: document,
-            path: paths[path_index],
+            path: full_path,
             omit_cross_dataset: config[:omit_cross_dataset_reference_data]
           )
 
@@ -115,6 +118,36 @@ module Stega
           end
         end
         result
+      end
+
+      def resolve_mapping(json_path, mappings)
+        return [mappings[json_path], json_path] if mappings.key?(json_path)
+
+        segments = parse_path_segments(json_path)
+        (segments.length - 1).downto(1) do |i|
+          candidate = "$" + segments[0...i].join
+          return [mappings[candidate], candidate] if mappings.key?(candidate)
+        end
+
+        return [mappings["$"], "$"] if mappings.key?("$")
+
+        nil
+      end
+
+      def parse_path_segments(json_path)
+        json_path.sub(/^\$/, "").scan(/\['[^']*'\]|\[\d+\]/)
+      end
+
+      def resolve_full_source_path(source_path, result_path, matched_path)
+        matched_segments = parse_path_segments(matched_path)
+        result_segments = parse_path_segments(result_path)
+        suffix_segments = result_segments[matched_segments.length..]
+
+        if suffix_segments&.any?
+          source_path + suffix_segments.join
+        else
+          source_path
+        end
       end
 
       def to_json_path(path)
