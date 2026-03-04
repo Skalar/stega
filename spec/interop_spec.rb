@@ -68,12 +68,12 @@ RSpec.describe "JavaScript Interoperability" do
     let(:result) { { "title" => "Hello World" } }
     let(:source_map) do
       {
-        "documents" => [{ "_id" => "doc1", "_type" => "post" }],
-        "paths" => ["$['title']"],
-        "mappings" => {
+        documents: [{ _id: "doc1", _type: "post" }],
+        paths: ["$['title']"],
+        mappings: {
           "$['title']" => {
-            "type" => "value",
-            "source" => { "document" => 0, "path" => 0, "type" => "documentValue" }
+            type: "value",
+            source: { document: 0, path: 0, type: "documentValue" }
           }
         }
       }
@@ -108,12 +108,12 @@ RSpec.describe "JavaScript Interoperability" do
     it "both handle nested objects consistently" do
       nested_result = { "author" => { "name" => "John" } }
       nested_source_map = {
-        "documents" => [{ "_id" => "doc1", "_type" => "post" }],
-        "paths" => ["$['author']['name']"],
-        "mappings" => {
+        documents: [{ _id: "doc1", _type: "post" }],
+        paths: ["$['author']['name']"],
+        mappings: {
           "$['author']['name']" => {
-            "type" => "value",
-            "source" => { "document" => 0, "path" => 0, "type" => "documentValue" }
+            type: "value",
+            source: { document: 0, path: 0, type: "documentValue" }
           }
         }
       }
@@ -130,16 +130,16 @@ RSpec.describe "JavaScript Interoperability" do
     it "both handle arrays consistently" do
       array_result = { "tags" => ["ruby", "javascript"] }
       array_source_map = {
-        "documents" => [{ "_id" => "doc1", "_type" => "post" }],
-        "paths" => ["$['tags'][0]", "$['tags'][1]"],
-        "mappings" => {
+        documents: [{ _id: "doc1", _type: "post" }],
+        paths: ["$['tags'][0]", "$['tags'][1]"],
+        mappings: {
           "$['tags'][0]" => {
-            "type" => "value",
-            "source" => { "document" => 0, "path" => 0, "type" => "documentValue" }
+            type: "value",
+            source: { document: 0, path: 0, type: "documentValue" }
           },
           "$['tags'][1]" => {
-            "type" => "value",
-            "source" => { "document" => 0, "path" => 1, "type" => "documentValue" }
+            type: "value",
+            source: { document: 0, path: 1, type: "documentValue" }
           }
         }
       }
