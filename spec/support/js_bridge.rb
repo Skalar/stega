@@ -5,7 +5,7 @@ require "json"
 
 module Stega
   module JsBridge
-    VENDOR_JS = File.expand_path("../../../vendor/js/vercel-stega.js", __FILE__)
+    VENDOR_JS = File.expand_path("../../vendor/js/vercel-stega.js", __dir__)
 
     class << self
       def encode(value)

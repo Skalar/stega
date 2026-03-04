@@ -3,13 +3,11 @@
 require "json"
 require "uri"
 require "date"
-require "open3"
 
 require "stega/version"
 require "stega/encoder"
 require "stega/legacy_encoder"
 require "stega/decoder"
-require "stega/js_bridge"
 require "stega/sanity"
 
 module Stega

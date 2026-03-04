@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
-require "stega/js_bridge"
+require_relative "support/js_bridge"
 
 RSpec.describe "JavaScript Interoperability" do
   describe "Ruby encode -> JS decode" do
