@@ -43,3 +43,4 @@ Gemfile.local
 .rbnext/
 
 gemfiles/*.lock
+node_modules

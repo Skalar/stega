@@ -1,0 +1,11 @@
+{
+  "name": "stega",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:Skalar/stega.git",
+  "author": "Theodor Tonum <theodor@tonum.no>",
+  "license": "MIT",
+  "dependencies": {
+    "@sanity/client": "^7.16.0"
+  }
+}

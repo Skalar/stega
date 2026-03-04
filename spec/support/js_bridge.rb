@@ -30,8 +30,8 @@ module Stega
           const encoded = stegaEncodeSourceMap(result, sourceMap, config);
           console.log(JSON.stringify(encoded));
         JS
-        stdout, status = Open3.capture2("node", "-e", script)
-        raise "Node.js error: #{stdout}" unless status.success?
+        stdout, stderr, status = Open3.capture3("node", "-e", script)
+        raise "Node.js error: #{stderr}\n#{stdout}" unless status.success?
         JSON.parse(stdout.strip)
       end
 
@@ -53,8 +53,8 @@ module Stega
           const result = stega.#{fn}(#{JSON.generate(arg)});
           console.log(JSON.stringify(result));
         JS
-        stdout, status = Open3.capture2("node", "-e", script)
-        raise "Node.js error: #{stdout}" unless status.success?
+        stdout, stderr, status = Open3.capture3("node", "-e", script)
+        raise "Node.js error: #{stderr}\n#{stdout}" unless status.success?
         JSON.parse(stdout.strip)
       end
     end
