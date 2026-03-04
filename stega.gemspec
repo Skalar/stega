@@ -6,22 +6,23 @@ Gem::Specification.new do |s|
   s.name = "stega"
   s.version = Stega::VERSION
   s.authors = ["Theodor Tonum"]
-  s.email = ["Theodor Tonum"]
+  s.email = ["theodor@tonum.no"]
   s.homepage = "https://github.com/rorkjop/stega"
-  s.summary = "Example description"
-  s.description = "Example description"
+  s.summary = "Steganographic encoding and decoding for strings"
+  s.description = "A Ruby implementation of Vercel's stega encoding for embedding invisible data in strings, with Sanity source map support."
 
   s.metadata = {
     "bug_tracker_uri" => "https://github.com/rorkjop/stega/issues",
-    "changelog_uri" => "https://github.com/rorkjop/stega/blob/master/CHANGELOG.md",
+    "changelog_uri" => "https://github.com/rorkjop/stega/blob/main/CHANGELOG.md",
     "documentation_uri" => "https://github.com/rorkjop/stega",
     "homepage_uri" => "https://github.com/rorkjop/stega",
-    "source_code_uri" => "https://github.com/rorkjop/stega"
+    "source_code_uri" => "https://github.com/rorkjop/stega",
+    "rubygems_mfa_required" => "true"
   }
 
   s.license = "MIT"
 
-  s.files = Dir.glob("lib/**/*") + Dir.glob("bin/**/*") + %w[README.md LICENSE.txt CHANGELOG.md]
+  s.files = Dir.glob("lib/**/*") + %w[README.md LICENSE.txt CHANGELOG.md]
   s.require_paths = ["lib"]
   s.required_ruby_version = ">= 3.2"
 
