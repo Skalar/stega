@@ -24,7 +24,7 @@ module Stega
       def encode_into_result(result, source_map, config)
         documents = source_map[:documents] || []
         paths = source_map[:paths] || []
-        mappings = source_map[:mappings] || {}
+        mappings = (source_map[:mappings] || {}).transform_keys(&:to_s)
 
         deep_transform(result, []) do |value, path|
           json_path = to_json_path(path)

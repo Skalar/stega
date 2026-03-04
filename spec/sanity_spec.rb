@@ -377,6 +377,26 @@ RSpec.describe Stega::Sanity do
         expect(decoded["href"]).to match(%r{/intent/edit/mode=presentation;id=doc-1;type=page;path=})
       end
 
+      it "encodes values when mapping keys are symbols (symbolize_names: true)" do
+        result = { "title" => "Hello World" }
+        source_map = {
+          documents: [{ _id: "doc1", _type: "post" }],
+          paths: ["$['title']"],
+          mappings: {
+            "$['title']": {
+              source: { document: 0, path: 0, type: "documentValue" }
+            }
+          }
+        }
+        config = { enabled: true, studio_url: "https://studio.sanity.io" }
+
+        encoded = Stega::Sanity.encode_source_map(result, source_map, config)
+        decoded = Stega.decode(encoded["title"])
+
+        expect(decoded["origin"]).to eq("sanity.io")
+        expect(decoded["href"]).to include("doc1")
+      end
+
       it "includes perspective and baseUrl in edit URL query params" do
         result = { "title" => "Hello" }
         source_map = {
