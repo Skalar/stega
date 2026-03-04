@@ -196,5 +196,251 @@ RSpec.describe Stega::Sanity do
       expect(decoded0["origin"]).to eq("sanity.io")
       expect(decoded1["origin"]).to eq("sanity.io")
     end
+
+    context "with symbol-keyed source maps (interop with external SanityStega)" do
+      let(:config) { { enabled: true, studio_url: "http://studio.test" } }
+
+      it "appends invisible stega characters to mapped string values" do
+        result = { "title" => "Hello World" }
+        source_map = {
+          documents: [{ _id: "doc-1", _type: "page" }],
+          paths: ["$['title']"],
+          mappings: {
+            "$['title']" => {
+              source: { type: "documentValue", document: 0, path: 0 }
+            }
+          }
+        }
+
+        encoded = Stega::Sanity.encode_source_map(result, source_map, config)
+        encoded_title = encoded["title"]
+
+        expect(encoded_title).to start_with("Hello World")
+        expect(encoded_title.length).to be > "Hello World".length
+
+        clean = encoded_title.gsub(/[\u200B\u200C\u200D\uFEFF]/, "")
+        expect(clean).to eq("Hello World")
+      end
+
+      it "encodes a payload that decodes to the correct edit intent URL" do
+        result = { "title" => "Test" }
+        source_map = {
+          documents: [{ _id: "abc-123", _type: "article" }],
+          paths: ["$['title']"],
+          mappings: {
+            "$['title']" => {
+              source: { type: "documentValue", document: 0, path: 0 }
+            }
+          }
+        }
+
+        encoded = Stega::Sanity.encode_source_map(result, source_map, config)
+        decoded = Stega.decode(encoded["title"])
+
+        expect(decoded["origin"]).to eq("sanity.io")
+        expect(decoded["href"]).to include("intent/edit/")
+          .and include("mode=presentation")
+          .and include("id=abc-123")
+          .and include("type=article")
+      end
+
+      context "with internal Sanity keys" do
+        let(:result) do
+          {
+            "_id" => "doc-1",
+            "_type" => "page",
+            "_ref" => "ref-1",
+            "_key" => "key-1",
+            "slug" => { "current" => "about" },
+            "title" => "About Us"
+          }
+        end
+        let(:source_map) do
+          {
+            documents: [{ _id: "doc-1", _type: "page" }],
+            paths: ["$['title']"],
+            mappings: {
+              "$['title']" => { source: { type: "documentValue", document: 0, path: 0 } }
+            }
+          }
+        end
+        let(:encoded) { Stega::Sanity.encode_source_map(result, source_map, config) }
+
+        { "_id" => "doc-1", "_type" => "page", "_ref" => "ref-1", "_key" => "key-1", "slug" => { "current" => "about" } }.each do |key, value|
+          it "does not encode #{key}" do
+            expect(encoded[key]).to eq(value)
+          end
+        end
+
+        it "still encodes mapped non-internal keys" do
+          expect(encoded["title"].length).to be > "About Us".length
+        end
+      end
+
+      it "traverses nested hashes and arrays to encode deeply nested strings" do
+        result = {
+          "blocks" => [
+            {
+              "_type" => "block",
+              "children" => [
+                { "_type" => "span", "text" => "Nested text" }
+              ]
+            }
+          ]
+        }
+        source_map = {
+          documents: [{ _id: "doc-1", _type: "page" }],
+          paths: ["$['blocks'][0]['children'][0]['text']"],
+          mappings: {
+            "$['blocks'][0]['children'][0]['text']" => {
+              source: { type: "documentValue", document: 0, path: 0 }
+            }
+          }
+        }
+
+        encoded = Stega::Sanity.encode_source_map(result, source_map, config)
+
+        span = encoded["blocks"][0]["children"][0]
+        expect(span["_type"]).to eq("span")
+        expect(span["text"]).to start_with("Nested text")
+        expect(span["text"].length).to be > "Nested text".length
+      end
+
+      it "leaves unmapped strings unchanged" do
+        result = { "title" => "Mapped", "description" => "Not mapped" }
+        source_map = {
+          documents: [{ _id: "doc-1", _type: "page" }],
+          paths: ["$['title']"],
+          mappings: {
+            "$['title']" => { source: { type: "documentValue", document: 0, path: 0 } }
+          }
+        }
+
+        encoded = Stega::Sanity.encode_source_map(result, source_map, config)
+
+        expect(encoded["title"].length).to be > "Mapped".length
+        expect(encoded["description"]).to eq("Not mapped")
+      end
+
+      it "preserves non-string values like numbers and booleans" do
+        result = { "title" => "Hello", "count" => 42, "active" => true }
+        source_map = {
+          documents: [{ _id: "doc-1", _type: "page" }],
+          paths: [],
+          mappings: {}
+        }
+
+        encoded = Stega::Sanity.encode_source_map(result, source_map, config)
+
+        expect(encoded["count"]).to eq(42)
+        expect(encoded["active"]).to be(true)
+      end
+
+      it "handles an empty mappings hash gracefully" do
+        result = { "title" => "Hello" }
+        source_map = { documents: [], paths: [], mappings: {} }
+
+        encoded = Stega::Sanity.encode_source_map(result, source_map, config)
+
+        expect(encoded).to eq({ "title" => "Hello" })
+      end
+
+      it "handles multiple documents in the source map" do
+        result = {
+          "title" => "Page Title",
+          "footer" => "Footer Text"
+        }
+        source_map = {
+          documents: [
+            { _id: "page-1", _type: "page" },
+            { _id: "settings-1", _type: "siteSettings" }
+          ],
+          paths: ["$['title']", "$['footer']"],
+          mappings: {
+            "$['title']" => { source: { type: "documentValue", document: 0, path: 0 } },
+            "$['footer']" => { source: { type: "documentValue", document: 1, path: 1 } }
+          }
+        }
+
+        encoded = Stega::Sanity.encode_source_map(result, source_map, config)
+
+        title_payload = Stega.decode(encoded["title"])
+        footer_payload = Stega.decode(encoded["footer"])
+
+        expect(title_payload["href"]).to include("id=page-1").and include("type=page")
+        expect(footer_payload["href"]).to include("id=settings-1").and include("type=siteSettings")
+      end
+
+      it "uses semicolon-delimited router params in edit URL" do
+        result = { "title" => "Hello" }
+        source_map = {
+          documents: [{ _id: "doc-1", _type: "page" }],
+          paths: ["$['title']"],
+          mappings: {
+            "$['title']" => { source: { type: "documentValue", document: 0, path: 0 } }
+          }
+        }
+
+        encoded = Stega::Sanity.encode_source_map(result, source_map, config)
+        decoded = Stega.decode(encoded["title"])
+
+        expect(decoded["href"]).to match(%r{/intent/edit/mode=presentation;id=doc-1;type=page;path=})
+      end
+
+      it "includes perspective and baseUrl in edit URL query params" do
+        result = { "title" => "Hello" }
+        source_map = {
+          documents: [{ _id: "doc-1", _type: "page" }],
+          paths: ["$['title']"],
+          mappings: {
+            "$['title']" => { source: { type: "documentValue", document: 0, path: 0 } }
+          }
+        }
+
+        encoded = Stega::Sanity.encode_source_map(result, source_map, config)
+        decoded = Stega.decode(encoded["title"])
+
+        uri = URI.parse(decoded["href"])
+        params = URI.decode_www_form(uri.query).to_h
+
+        expect(params["perspective"]).to eq("previewDrafts")
+        expect(params["baseUrl"]).to eq("http://studio.test")
+      end
+
+      it "converts JSON path to studio path format in edit URL" do
+        result = { "body" => [{ "children" => [{ "text" => "Hello" }] }] }
+        source_map = {
+          documents: [{ _id: "doc-1", _type: "page" }],
+          paths: ["$['body'][0]['children'][0]['text']"],
+          mappings: {
+            "$['body'][0]['children'][0]['text']" => {
+              source: { type: "documentValue", document: 0, path: 0 }
+            }
+          }
+        }
+
+        encoded = Stega::Sanity.encode_source_map(result, source_map, config)
+        decoded = Stega.decode(encoded["body"][0]["children"][0]["text"])
+
+        expect(decoded["href"]).to include("path=body%5B0%5D.children%5B0%5D.text")
+      end
+
+      it "resolves mappings by walking up the path" do
+        result = { "content" => { "body" => { "title" => "Hello" } } }
+        source_map = {
+          documents: [{ _id: "doc-1", _type: "page" }],
+          paths: ["$['content']"],
+          mappings: {
+            "$['content']" => { source: { type: "documentValue", document: 0, path: 0 } }
+          }
+        }
+
+        encoded = Stega::Sanity.encode_source_map(result, source_map, config)
+        decoded = Stega.decode(encoded["content"]["body"]["title"])
+
+        expect(decoded["origin"]).to eq("sanity.io")
+        expect(decoded["href"]).to include("id=doc-1")
+      end
+    end
   end
 end
