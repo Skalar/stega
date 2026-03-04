@@ -1,7 +1,11 @@
 # frozen_string_literal: true
 
+require "set"
+
 module Stega
   module Sanity
+    SKIP_KEYS = Set.new(%w[_id _type _ref _key _createdAt _updatedAt _rev _originalId _system slug]).freeze
+
     class << self
       def encode_source_map(result, source_map, config)
         validate_config!(config)
@@ -67,7 +71,11 @@ module Stega
         case obj
         when Hash
           obj.each_with_object({}) do |(key, value), result|
-            result[key] = deep_transform(value, path + [key], &block)
+            if SKIP_KEYS.include?(key.to_s)
+              result[key] = value
+            else
+              result[key] = deep_transform(value, path + [key], &block)
+            end
           end
         when Array
           obj.each_with_index.map do |value, index|
