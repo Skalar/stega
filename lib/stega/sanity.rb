@@ -18,22 +18,22 @@ module Stega
       end
 
       def encode_into_result(result, source_map, config)
-        documents = source_map["documents"] || []
-        paths = source_map["paths"] || []
-        mappings = source_map["mappings"] || {}
+        documents = source_map["documents"] || source_map[:documents] || []
+        paths = source_map["paths"] || source_map[:paths] || []
+        mappings = source_map["mappings"] || source_map[:mappings] || {}
 
         deep_transform(result, []) do |value, path|
           json_path = to_json_path(path)
           mapping = mappings[json_path]
 
           next value unless mapping && value.is_a?(String)
-          next value unless mapping["type"] == "value"
+          next value unless (mapping["type"] || mapping[:type] || "value") == "value"
 
-          source = mapping["source"]
-          next value unless source && source["type"] == "documentValue"
+          source = mapping["source"] || mapping[:source]
+          next value unless source && (source["type"] || source[:type]) == "documentValue"
 
-          doc_index = source["document"]
-          path_index = source["path"]
+          doc_index = source["document"] || source[:document]
+          path_index = source["path"] || source[:path]
           document = documents[doc_index]
 
           next value unless document
@@ -76,10 +76,10 @@ module Stega
       end
 
       def create_edit_url(studio_url:, document:, path:, omit_cross_dataset: false)
-        doc_id = document["_id"]
-        doc_type = document["_type"]
-        project_id = document["_projectId"]
-        dataset = document["_dataset"]
+        doc_id = document["_id"] || document[:_id]
+        doc_type = document["_type"] || document[:_type]
+        project_id = document["_projectId"] || document[:_projectId]
+        dataset = document["_dataset"] || document[:_dataset]
 
         base = resolve_studio_base_route(studio_url)
 
