@@ -81,21 +81,40 @@ module Stega
         project_id = document["_projectId"] || document[:_projectId]
         dataset = document["_dataset"] || document[:_dataset]
 
-        base = resolve_studio_base_route(studio_url)
+        studio_path = json_path_to_studio_path(path)
 
-        params_hash = { id: doc_id, type: doc_type, path: path }
+        router_parts = [
+          "mode=presentation",
+          "id=#{doc_id}",
+          "type=#{doc_type}",
+          "path=#{URI.encode_www_form_component(studio_path)}"
+        ]
+        router_params = router_parts.join(";")
+
+        search_hash = { baseUrl: studio_url, id: doc_id, type: doc_type, path: studio_path, perspective: "previewDrafts" }
         unless omit_cross_dataset
-          params_hash[:projectId] = project_id if project_id
-          params_hash[:dataset] = dataset if dataset
+          search_hash[:projectId] = project_id if project_id
+          search_hash[:dataset] = dataset if dataset
         end
+        search_params = URI.encode_www_form(search_hash)
 
-        params = URI.encode_www_form(params_hash)
-        "#{base[:base_url]}/intent/edit?#{params}"
+        "#{studio_url}/intent/edit/#{router_params}?#{search_params}"
       end
 
-      def resolve_studio_base_route(studio_url)
-        uri = URI.parse(studio_url)
-        { base_url: "#{uri.scheme}://#{uri.host}" }
+      def json_path_to_studio_path(json_path)
+        rest = json_path.sub(/^\$/, "")
+        segments = rest.scan(/\['([^']*)'\]|\[(\d+)\]/)
+
+        result = +""
+        segments.each_with_index do |(key, index), i|
+          if index
+            result << "[#{index}]"
+          else
+            result << "." if i > 0
+            result << key
+          end
+        end
+        result
       end
 
       def to_json_path(path)
