@@ -11,7 +11,7 @@ module Stega
     ].freeze
 
     # Prefix: 4 zero-width spaces used as a magic marker
-    STEGA_PREFIX = (BASE4_CHARS[0] * 4).freeze
+    STEGA_PREFIX = (BASE4_CHARS[0] * 4)
 
     # Encode a value into an invisible steganographic string (base-4 encoding).
     # Each byte is split into four 2-bit groups, each mapped to an invisible character.

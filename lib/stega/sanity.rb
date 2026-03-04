@@ -62,7 +62,7 @@ module Stega
             omit_cross_dataset: config[:omit_cross_dataset_reference_data]
           )
 
-          payload = { "origin" => "sanity.io", "href" => edit_url }
+          payload = {"origin" => "sanity.io", "href" => edit_url}
           Stega.combine(value, payload)
         end
       end
@@ -71,10 +71,10 @@ module Stega
         case obj
         when Hash
           obj.each_with_object({}) do |(key, value), result|
-            if SKIP_KEYS.include?(key.to_s)
-              result[key] = value
+            result[key] = if SKIP_KEYS.include?(key.to_s)
+              value
             else
-              result[key] = deep_transform(value, path + [key], &block)
+              deep_transform(value, path + [key], &block)
             end
           end
         when Array
@@ -102,7 +102,7 @@ module Stega
         ]
         router_params = router_parts.join(";")
 
-        search_hash = { baseUrl: studio_url, id: doc_id, type: doc_type, path: studio_path, perspective: "previewDrafts" }
+        search_hash = {baseUrl: studio_url, id: doc_id, type: doc_type, path: studio_path, perspective: "previewDrafts"}
         unless omit_cross_dataset
           search_hash[:projectId] = project_id if project_id
           search_hash[:dataset] = dataset if dataset

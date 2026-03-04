@@ -28,53 +28,53 @@ RSpec.describe Stega do
     end
 
     it "preserves complex objects" do
-      value = { "foo" => "bar", "nested" => { "arr" => [1, 2, 3] } }
+      value = {"foo" => "bar", "nested" => {"arr" => [1, 2, 3]}}
       expect(Stega.decode(Stega.encode(value))).to eq(value)
     end
   end
 
   describe ".combine" do
     it "appends encoded data to visible string" do
-      result = Stega.combine("visible", { "key" => "value" })
+      result = Stega.combine("visible", {"key" => "value"})
       expect(result).to start_with("visible")
       expect(result.length).to be > "visible".length
-      expect(Stega.decode(result)).to eq({ "key" => "value" })
+      expect(Stega.decode(result)).to eq({"key" => "value"})
     end
 
     it "with skip mode returns only visible string" do
-      result = Stega.combine("visible", { "key" => "value" }, :skip)
+      result = Stega.combine("visible", {"key" => "value"}, :skip)
       expect(result).to eq("visible")
     end
 
     it "with skip=true returns only visible string" do
-      result = Stega.combine("visible", { "key" => "value" }, true)
+      result = Stega.combine("visible", {"key" => "value"}, true)
       expect(result).to eq("visible")
     end
 
     it "auto-skips URLs" do
-      result = Stega.combine("https://example.com/path", { "key" => "value" })
+      result = Stega.combine("https://example.com/path", {"key" => "value"})
       expect(result).to eq("https://example.com/path")
     end
 
     it "auto-skips relative URLs" do
-      result = Stega.combine("/path/to/resource", { "key" => "value" })
+      result = Stega.combine("/path/to/resource", {"key" => "value"})
       expect(result).to eq("/path/to/resource")
     end
 
     it "auto-skips dates" do
-      result = Stega.combine("2024-01-15", { "key" => "value" })
+      result = Stega.combine("2024-01-15", {"key" => "value"})
       expect(result).to eq("2024-01-15")
     end
 
     it "auto-skips ISO date strings" do
-      result = Stega.combine("2024-01-15T10:30:00Z", { "key" => "value" })
+      result = Stega.combine("2024-01-15T10:30:00Z", {"key" => "value"})
       expect(result).to eq("2024-01-15T10:30:00Z")
     end
   end
 
   describe ".split" do
     it "separates visible and encoded parts" do
-      combined = Stega.combine("visible", { "data" => 123 })
+      combined = Stega.combine("visible", {"data" => 123})
       result = Stega.split(combined)
 
       expect(result[:cleaned]).to eq("visible")
@@ -97,16 +97,16 @@ RSpec.describe Stega do
 
   describe ".clean" do
     it "removes stega data from strings" do
-      combined = Stega.combine("visible", { "hidden" => "data" })
+      combined = Stega.combine("visible", {"hidden" => "data"})
       expect(Stega.clean(combined)).to eq("visible")
     end
 
     it "handles nested objects" do
       obj = {
-        "name" => Stega.combine("John", { "edit" => true }),
+        "name" => Stega.combine("John", {"edit" => true}),
         "items" => [
-          Stega.combine("item1", { "id" => 1 }),
-          Stega.combine("item2", { "id" => 2 })
+          Stega.combine("item1", {"id" => 1}),
+          Stega.combine("item2", {"id" => 2})
         ]
       }
       cleaned = Stega.clean(obj)
@@ -143,15 +143,15 @@ RSpec.describe Stega do
 
   describe ".decode_all" do
     it "returns array of payloads" do
-      encoded1 = Stega.encode({ "first" => 1 })
-      encoded2 = Stega.encode({ "second" => 2 })
+      encoded1 = Stega.encode({"first" => 1})
+      encoded2 = Stega.encode({"second" => 2})
       combined = "prefix#{encoded1}middle#{encoded2}suffix"
 
       results = Stega.decode_all(combined)
       expect(results).to be_an(Array)
       expect(results.length).to eq(2)
-      expect(results[0]).to eq({ "first" => 1 })
-      expect(results[1]).to eq({ "second" => 2 })
+      expect(results[0]).to eq({"first" => 1})
+      expect(results[1]).to eq({"second" => 2})
     end
 
     it "returns nil for non-encoded strings" do
@@ -162,9 +162,9 @@ RSpec.describe Stega do
 
   describe ".legacy_encode" do
     it "produces decodable output" do
-      encoded = Stega.legacy_encode({ "test" => "value" })
+      encoded = Stega.legacy_encode({"test" => "value"})
       decoded = Stega.decode(encoded)
-      expect(decoded).to eq({ "test" => "value" })
+      expect(decoded).to eq({"test" => "value"})
     end
 
     it "produces different output than modern encode" do

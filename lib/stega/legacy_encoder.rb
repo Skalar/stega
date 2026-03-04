@@ -31,7 +31,7 @@ module Stega
         code = char.ord
         if code > 255
           raise ArgumentError,
-                "Only ASCII edit info can be encoded. Error attempting to encode #{json} on character #{char} (#{code})"
+            "Only ASCII edit info can be encoded. Error attempting to encode #{json} on character #{char} (#{code})"
         end
 
         hex = code.to_s(16).rjust(2, "0")

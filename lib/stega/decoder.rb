@@ -52,9 +52,9 @@ module Stega
 
       bytes.length.times do |i|
         bytes[i] = (BASE4_REVERSE_MAP[data_chars[i * 4]] << 6) |
-                   (BASE4_REVERSE_MAP[data_chars[i * 4 + 1]] << 4) |
-                   (BASE4_REVERSE_MAP[data_chars[i * 4 + 2]] << 2) |
-                   BASE4_REVERSE_MAP[data_chars[i * 4 + 3]]
+          (BASE4_REVERSE_MAP[data_chars[i * 4 + 1]] << 4) |
+          (BASE4_REVERSE_MAP[data_chars[i * 4 + 2]] << 2) |
+          BASE4_REVERSE_MAP[data_chars[i * 4 + 3]]
       end
 
       decoded = bytes.pack("C*").force_encoding(Encoding::UTF_8)
@@ -75,7 +75,7 @@ module Stega
       (chars.length / 2).times do |i|
         idx = (chars.length / 2) - 1 - i
         hex_str = HEX_REVERSE_MAP[chars[idx * 2].ord].to_s +
-                  HEX_REVERSE_MAP[chars[idx * 2 + 1].ord].to_s
+          HEX_REVERSE_MAP[chars[idx * 2 + 1].ord].to_s
         ascii_chars.unshift(hex_str.to_i(16).chr)
       end
 

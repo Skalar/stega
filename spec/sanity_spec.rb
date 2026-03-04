@@ -3,35 +3,35 @@
 RSpec.describe Stega::Sanity do
   describe ".encode_source_map" do
     it "raises TypeError when enabled is false" do
-      config = { enabled: false }
+      config = {enabled: false}
       expect { Stega::Sanity.encode_source_map({}, {}, config) }
         .to raise_error(TypeError, /enabled must be true/)
     end
 
     it "returns result unchanged when source_map is nil" do
-      config = { enabled: true, studio_url: "https://studio.sanity.io" }
-      result = { "title" => "Hello" }
+      config = {enabled: true, studio_url: "https://studio.sanity.io"}
+      result = {"title" => "Hello"}
       expect(Stega::Sanity.encode_source_map(result, nil, config)).to eq(result)
     end
 
     it "raises TypeError when studio_url is not defined" do
-      config = { enabled: true }
+      config = {enabled: true}
       expect { Stega::Sanity.encode_source_map({}, {}, config) }
         .to raise_error(TypeError, /studio_url must be defined/)
     end
 
     it "encodes string values from source map" do
-      result = { "title" => "Hello World" }
+      result = {"title" => "Hello World"}
       source_map = {
-        documents: [{ _id: "doc1", _type: "post" }],
+        documents: [{_id: "doc1", _type: "post"}],
         paths: ["$['title']"],
         mappings: {
           "$['title']" => {
-            source: { document: 0, path: 0, type: "documentValue" }
+            source: {document: 0, path: 0, type: "documentValue"}
           }
         }
       }
-      config = { enabled: true, studio_url: "https://studio.sanity.io" }
+      config = {enabled: true, studio_url: "https://studio.sanity.io"}
 
       encoded = Stega::Sanity.encode_source_map(result, source_map, config)
       decoded = Stega.decode(encoded["title"])
@@ -41,38 +41,38 @@ RSpec.describe Stega::Sanity do
     end
 
     it "skips URL values by default" do
-      result = { "url" => "https://example.com" }
+      result = {"url" => "https://example.com"}
       source_map = {
-        documents: [{ _id: "doc1", _type: "post" }],
+        documents: [{_id: "doc1", _type: "post"}],
         paths: ["$['url']"],
         mappings: {
           "$['url']" => {
-            source: { document: 0, path: 0, type: "documentValue" }
+            source: {document: 0, path: 0, type: "documentValue"}
           }
         }
       }
-      config = { enabled: true, studio_url: "https://studio.sanity.io" }
+      config = {enabled: true, studio_url: "https://studio.sanity.io"}
 
       encoded = Stega::Sanity.encode_source_map(result, source_map, config)
       expect(encoded["url"]).to eq("https://example.com")
     end
 
     it "uses custom filter when provided" do
-      result = { "title" => "skip-me", "other" => "encode-me" }
+      result = {"title" => "skip-me", "other" => "encode-me"}
       source_map = {
-        documents: [{ _id: "doc1", _type: "post" }],
+        documents: [{_id: "doc1", _type: "post"}],
         paths: ["$['title']", "$['other']"],
         mappings: {
           "$['title']" => {
-            source: { document: 0, path: 0, type: "documentValue" }
+            source: {document: 0, path: 0, type: "documentValue"}
           },
           "$['other']" => {
-            source: { document: 0, path: 1, type: "documentValue" }
+            source: {document: 0, path: 1, type: "documentValue"}
           }
         }
       }
       filter = ->(ctx) { ctx[:value] != "skip-me" }
-      config = { enabled: true, studio_url: "https://studio.sanity.io", filter: filter }
+      config = {enabled: true, studio_url: "https://studio.sanity.io", filter: filter}
 
       encoded = Stega::Sanity.encode_source_map(result, source_map, config)
 
@@ -81,17 +81,17 @@ RSpec.describe Stega::Sanity do
     end
 
     it "creates edit URLs with document metadata" do
-      result = { "title" => "Hello" }
+      result = {"title" => "Hello"}
       source_map = {
-        documents: [{ _id: "doc123", _type: "article" }],
+        documents: [{_id: "doc123", _type: "article"}],
         paths: ["$['content']['title']"],
         mappings: {
           "$['title']" => {
-            source: { document: 0, path: 0, type: "documentValue" }
+            source: {document: 0, path: 0, type: "documentValue"}
           }
         }
       }
-      config = { enabled: true, studio_url: "https://my-studio.sanity.studio" }
+      config = {enabled: true, studio_url: "https://my-studio.sanity.studio"}
 
       encoded = Stega::Sanity.encode_source_map(result, source_map, config)
       decoded = Stega.decode(encoded["title"])
@@ -103,17 +103,17 @@ RSpec.describe Stega::Sanity do
     end
 
     it "includes dataset and projectId by default" do
-      result = { "title" => "Hello" }
+      result = {"title" => "Hello"}
       source_map = {
-        documents: [{ _id: "doc1", _type: "post", _projectId: "proj123", _dataset: "production" }],
+        documents: [{_id: "doc1", _type: "post", _projectId: "proj123", _dataset: "production"}],
         paths: ["$['title']"],
         mappings: {
           "$['title']" => {
-            source: { document: 0, path: 0, type: "documentValue" }
+            source: {document: 0, path: 0, type: "documentValue"}
           }
         }
       }
-      config = { enabled: true, studio_url: "https://studio.sanity.io" }
+      config = {enabled: true, studio_url: "https://studio.sanity.io"}
 
       encoded = Stega::Sanity.encode_source_map(result, source_map, config)
       decoded = Stega.decode(encoded["title"])
@@ -123,17 +123,17 @@ RSpec.describe Stega::Sanity do
     end
 
     it "omits dataset/projectId when omit_cross_dataset_reference_data is true" do
-      result = { "title" => "Hello" }
+      result = {"title" => "Hello"}
       source_map = {
-        documents: [{ _id: "doc1", _type: "post", _projectId: "proj123", _dataset: "production" }],
+        documents: [{_id: "doc1", _type: "post", _projectId: "proj123", _dataset: "production"}],
         paths: ["$['title']"],
         mappings: {
           "$['title']" => {
-            source: { document: 0, path: 0, type: "documentValue" }
+            source: {document: 0, path: 0, type: "documentValue"}
           }
         }
       }
-      config = { enabled: true, studio_url: "https://studio.sanity.io", omit_cross_dataset_reference_data: true }
+      config = {enabled: true, studio_url: "https://studio.sanity.io", omit_cross_dataset_reference_data: true}
 
       encoded = Stega::Sanity.encode_source_map(result, source_map, config)
       decoded = Stega.decode(encoded["title"])
@@ -143,17 +143,17 @@ RSpec.describe Stega::Sanity do
     end
 
     it "encodes strings in nested objects" do
-      result = { "author" => { "name" => "John" } }
+      result = {"author" => {"name" => "John"}}
       source_map = {
-        documents: [{ _id: "doc1", _type: "post" }],
+        documents: [{_id: "doc1", _type: "post"}],
         paths: ["$['author']['name']"],
         mappings: {
           "$['author']['name']" => {
-            source: { document: 0, path: 0, type: "documentValue" }
+            source: {document: 0, path: 0, type: "documentValue"}
           }
         }
       }
-      config = { enabled: true, studio_url: "https://studio.sanity.io" }
+      config = {enabled: true, studio_url: "https://studio.sanity.io"}
 
       encoded = Stega::Sanity.encode_source_map(result, source_map, config)
       decoded = Stega.decode(encoded["author"]["name"])
@@ -163,20 +163,20 @@ RSpec.describe Stega::Sanity do
     end
 
     it "encodes strings in arrays" do
-      result = { "tags" => ["ruby", "javascript"] }
+      result = {"tags" => ["ruby", "javascript"]}
       source_map = {
-        documents: [{ _id: "doc1", _type: "post" }],
+        documents: [{_id: "doc1", _type: "post"}],
         paths: ["$['tags'][0]", "$['tags'][1]"],
         mappings: {
           "$['tags'][0]" => {
-            source: { document: 0, path: 0, type: "documentValue" }
+            source: {document: 0, path: 0, type: "documentValue"}
           },
           "$['tags'][1]" => {
-            source: { document: 0, path: 1, type: "documentValue" }
+            source: {document: 0, path: 1, type: "documentValue"}
           }
         }
       }
-      config = { enabled: true, studio_url: "https://studio.sanity.io" }
+      config = {enabled: true, studio_url: "https://studio.sanity.io"}
 
       encoded = Stega::Sanity.encode_source_map(result, source_map, config)
 
@@ -188,16 +188,16 @@ RSpec.describe Stega::Sanity do
     end
 
     context "with symbol-keyed source maps (interop with external SanityStega)" do
-      let(:config) { { enabled: true, studio_url: "http://studio.test" } }
+      let(:config) { {enabled: true, studio_url: "http://studio.test"} }
 
       it "appends invisible stega characters to mapped string values" do
-        result = { "title" => "Hello World" }
+        result = {"title" => "Hello World"}
         source_map = {
-          documents: [{ _id: "doc-1", _type: "page" }],
+          documents: [{_id: "doc-1", _type: "page"}],
           paths: ["$['title']"],
           mappings: {
             "$['title']" => {
-              source: { type: "documentValue", document: 0, path: 0 }
+              source: {type: "documentValue", document: 0, path: 0}
             }
           }
         }
@@ -213,13 +213,13 @@ RSpec.describe Stega::Sanity do
       end
 
       it "encodes a payload that decodes to the correct edit intent URL" do
-        result = { "title" => "Test" }
+        result = {"title" => "Test"}
         source_map = {
-          documents: [{ _id: "abc-123", _type: "article" }],
+          documents: [{_id: "abc-123", _type: "article"}],
           paths: ["$['title']"],
           mappings: {
             "$['title']" => {
-              source: { type: "documentValue", document: 0, path: 0 }
+              source: {type: "documentValue", document: 0, path: 0}
             }
           }
         }
@@ -241,22 +241,22 @@ RSpec.describe Stega::Sanity do
             "_type" => "page",
             "_ref" => "ref-1",
             "_key" => "key-1",
-            "slug" => { "current" => "about" },
+            "slug" => {"current" => "about"},
             "title" => "About Us"
           }
         end
         let(:source_map) do
           {
-            documents: [{ _id: "doc-1", _type: "page" }],
+            documents: [{_id: "doc-1", _type: "page"}],
             paths: ["$['title']"],
             mappings: {
-              "$['title']" => { source: { type: "documentValue", document: 0, path: 0 } }
+              "$['title']" => {source: {type: "documentValue", document: 0, path: 0}}
             }
           }
         end
         let(:encoded) { Stega::Sanity.encode_source_map(result, source_map, config) }
 
-        { "_id" => "doc-1", "_type" => "page", "_ref" => "ref-1", "_key" => "key-1", "slug" => { "current" => "about" } }.each do |key, value|
+        {"_id" => "doc-1", "_type" => "page", "_ref" => "ref-1", "_key" => "key-1", "slug" => {"current" => "about"}}.each do |key, value|
           it "does not encode #{key}" do
             expect(encoded[key]).to eq(value)
           end
@@ -273,17 +273,17 @@ RSpec.describe Stega::Sanity do
             {
               "_type" => "block",
               "children" => [
-                { "_type" => "span", "text" => "Nested text" }
+                {"_type" => "span", "text" => "Nested text"}
               ]
             }
           ]
         }
         source_map = {
-          documents: [{ _id: "doc-1", _type: "page" }],
+          documents: [{_id: "doc-1", _type: "page"}],
           paths: ["$['blocks'][0]['children'][0]['text']"],
           mappings: {
             "$['blocks'][0]['children'][0]['text']" => {
-              source: { type: "documentValue", document: 0, path: 0 }
+              source: {type: "documentValue", document: 0, path: 0}
             }
           }
         }
@@ -297,12 +297,12 @@ RSpec.describe Stega::Sanity do
       end
 
       it "leaves unmapped strings unchanged" do
-        result = { "title" => "Mapped", "description" => "Not mapped" }
+        result = {"title" => "Mapped", "description" => "Not mapped"}
         source_map = {
-          documents: [{ _id: "doc-1", _type: "page" }],
+          documents: [{_id: "doc-1", _type: "page"}],
           paths: ["$['title']"],
           mappings: {
-            "$['title']" => { source: { type: "documentValue", document: 0, path: 0 } }
+            "$['title']" => {source: {type: "documentValue", document: 0, path: 0}}
           }
         }
 
@@ -313,9 +313,9 @@ RSpec.describe Stega::Sanity do
       end
 
       it "preserves non-string values like numbers and booleans" do
-        result = { "title" => "Hello", "count" => 42, "active" => true }
+        result = {"title" => "Hello", "count" => 42, "active" => true}
         source_map = {
-          documents: [{ _id: "doc-1", _type: "page" }],
+          documents: [{_id: "doc-1", _type: "page"}],
           paths: [],
           mappings: {}
         }
@@ -327,12 +327,12 @@ RSpec.describe Stega::Sanity do
       end
 
       it "handles an empty mappings hash gracefully" do
-        result = { "title" => "Hello" }
-        source_map = { documents: [], paths: [], mappings: {} }
+        result = {"title" => "Hello"}
+        source_map = {documents: [], paths: [], mappings: {}}
 
         encoded = Stega::Sanity.encode_source_map(result, source_map, config)
 
-        expect(encoded).to eq({ "title" => "Hello" })
+        expect(encoded).to eq({"title" => "Hello"})
       end
 
       it "handles multiple documents in the source map" do
@@ -342,13 +342,13 @@ RSpec.describe Stega::Sanity do
         }
         source_map = {
           documents: [
-            { _id: "page-1", _type: "page" },
-            { _id: "settings-1", _type: "siteSettings" }
+            {_id: "page-1", _type: "page"},
+            {_id: "settings-1", _type: "siteSettings"}
           ],
           paths: ["$['title']", "$['footer']"],
           mappings: {
-            "$['title']" => { source: { type: "documentValue", document: 0, path: 0 } },
-            "$['footer']" => { source: { type: "documentValue", document: 1, path: 1 } }
+            "$['title']" => {source: {type: "documentValue", document: 0, path: 0}},
+            "$['footer']" => {source: {type: "documentValue", document: 1, path: 1}}
           }
         }
 
@@ -362,12 +362,12 @@ RSpec.describe Stega::Sanity do
       end
 
       it "uses semicolon-delimited router params in edit URL" do
-        result = { "title" => "Hello" }
+        result = {"title" => "Hello"}
         source_map = {
-          documents: [{ _id: "doc-1", _type: "page" }],
+          documents: [{_id: "doc-1", _type: "page"}],
           paths: ["$['title']"],
           mappings: {
-            "$['title']" => { source: { type: "documentValue", document: 0, path: 0 } }
+            "$['title']" => {source: {type: "documentValue", document: 0, path: 0}}
           }
         }
 
@@ -378,17 +378,17 @@ RSpec.describe Stega::Sanity do
       end
 
       it "encodes values when mapping keys are symbols (symbolize_names: true)" do
-        result = { "title" => "Hello World" }
+        result = {"title" => "Hello World"}
         source_map = {
-          documents: [{ _id: "doc1", _type: "post" }],
+          documents: [{_id: "doc1", _type: "post"}],
           paths: ["$['title']"],
           mappings: {
             "$['title']": {
-              source: { document: 0, path: 0, type: "documentValue" }
+              source: {document: 0, path: 0, type: "documentValue"}
             }
           }
         }
-        config = { enabled: true, studio_url: "https://studio.sanity.io" }
+        config = {enabled: true, studio_url: "https://studio.sanity.io"}
 
         encoded = Stega::Sanity.encode_source_map(result, source_map, config)
         decoded = Stega.decode(encoded["title"])
@@ -398,12 +398,12 @@ RSpec.describe Stega::Sanity do
       end
 
       it "includes perspective and baseUrl in edit URL query params" do
-        result = { "title" => "Hello" }
+        result = {"title" => "Hello"}
         source_map = {
-          documents: [{ _id: "doc-1", _type: "page" }],
+          documents: [{_id: "doc-1", _type: "page"}],
           paths: ["$['title']"],
           mappings: {
-            "$['title']" => { source: { type: "documentValue", document: 0, path: 0 } }
+            "$['title']" => {source: {type: "documentValue", document: 0, path: 0}}
           }
         }
 
@@ -418,13 +418,13 @@ RSpec.describe Stega::Sanity do
       end
 
       it "converts JSON path to studio path format in edit URL" do
-        result = { "body" => [{ "children" => [{ "text" => "Hello" }] }] }
+        result = {"body" => [{"children" => [{"text" => "Hello"}]}]}
         source_map = {
-          documents: [{ _id: "doc-1", _type: "page" }],
+          documents: [{_id: "doc-1", _type: "page"}],
           paths: ["$['body'][0]['children'][0]['text']"],
           mappings: {
             "$['body'][0]['children'][0]['text']" => {
-              source: { type: "documentValue", document: 0, path: 0 }
+              source: {type: "documentValue", document: 0, path: 0}
             }
           }
         }
@@ -436,12 +436,12 @@ RSpec.describe Stega::Sanity do
       end
 
       it "resolves mappings by walking up the path" do
-        result = { "content" => { "body" => { "title" => "Hello" } } }
+        result = {"content" => {"body" => {"title" => "Hello"}}}
         source_map = {
-          documents: [{ _id: "doc-1", _type: "page" }],
+          documents: [{_id: "doc-1", _type: "page"}],
           paths: ["$['content']"],
           mappings: {
-            "$['content']" => { source: { type: "documentValue", document: 0, path: 0 } }
+            "$['content']" => {source: {type: "documentValue", document: 0, path: 0}}
           }
         }
 

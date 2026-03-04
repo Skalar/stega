@@ -39,13 +39,13 @@ module Stega
     # mode can be :auto (default), :skip (true), or false
     def combine(visible, data, mode = :auto)
       skip = case mode
-             when true, :skip
-               true
-             when :auto
-               date_like?(visible) || url?(visible)
-             else
-               false
-             end
+      when true, :skip
+        true
+      when :auto
+        date_like?(visible) || url?(visible)
+      else
+        false
+      end
 
       return visible if skip
 
@@ -79,7 +79,7 @@ module Stega
 
       # If it contains letters but doesn't match date pattern, not a date
       if str.match?(/[a-z]/i) &&
-         !str.match?(/\d+(?:[-:\/]\d+){2}(?:T\d+(?:[-:\/]\d+){1,2}(\.\d+)?Z?)?/)
+          !str.match?(/\d+(?:[-:\/]\d+){2}(?:T\d+(?:[-:\/]\d+){1,2}(\.\d+)?Z?)?/)
         return false
       end
 

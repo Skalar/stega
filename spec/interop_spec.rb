@@ -20,7 +20,7 @@ RSpec.describe "JavaScript Interoperability" do
     end
 
     it "decodes an object encoded by Ruby" do
-      value = { "origin" => "test", "data" => { "id" => 123 } }
+      value = {"origin" => "test", "data" => {"id" => 123}}
       encoded = Stega.encode(value)
       decoded = Stega::JsBridge.decode(encoded)
       expect(decoded).to eq(value)
@@ -50,7 +50,7 @@ RSpec.describe "JavaScript Interoperability" do
     end
 
     it "decodes an object encoded by JS" do
-      value = { "origin" => "test", "data" => { "id" => 123 } }
+      value = {"origin" => "test", "data" => {"id" => 123}}
       encoded = Stega::JsBridge.encode(value)
       decoded = Stega.decode(encoded)
       expect(decoded).to eq(value)
@@ -65,20 +65,20 @@ RSpec.describe "JavaScript Interoperability" do
   end
 
   describe "Sanity encode_source_map interoperability" do
-    let(:result) { { "title" => "Hello World" } }
+    let(:result) { {"title" => "Hello World"} }
     let(:source_map) do
       {
-        documents: [{ _id: "doc1", _type: "post" }],
+        documents: [{_id: "doc1", _type: "post"}],
         paths: ["$['title']"],
         mappings: {
           "$['title']" => {
             type: "value",
-            source: { document: 0, path: 0, type: "documentValue" }
+            source: {document: 0, path: 0, type: "documentValue"}
           }
         }
       }
     end
-    let(:config) { { enabled: true, studio_url: "https://studio.sanity.io" } }
+    let(:config) { {enabled: true, studio_url: "https://studio.sanity.io"} }
 
     it "Ruby encode_source_map output is decodable by JS" do
       encoded = Stega::Sanity.encode_source_map(result, source_map, config)
@@ -106,14 +106,14 @@ RSpec.describe "JavaScript Interoperability" do
     end
 
     it "both handle nested objects consistently" do
-      nested_result = { "author" => { "name" => "John" } }
+      nested_result = {"author" => {"name" => "John"}}
       nested_source_map = {
-        documents: [{ _id: "doc1", _type: "post" }],
+        documents: [{_id: "doc1", _type: "post"}],
         paths: ["$['author']['name']"],
         mappings: {
           "$['author']['name']" => {
             type: "value",
-            source: { document: 0, path: 0, type: "documentValue" }
+            source: {document: 0, path: 0, type: "documentValue"}
           }
         }
       }
@@ -128,18 +128,18 @@ RSpec.describe "JavaScript Interoperability" do
     end
 
     it "both handle arrays consistently" do
-      array_result = { "tags" => ["ruby", "javascript"] }
+      array_result = {"tags" => ["ruby", "javascript"]}
       array_source_map = {
-        documents: [{ _id: "doc1", _type: "post" }],
+        documents: [{_id: "doc1", _type: "post"}],
         paths: ["$['tags'][0]", "$['tags'][1]"],
         mappings: {
           "$['tags'][0]" => {
             type: "value",
-            source: { document: 0, path: 0, type: "documentValue" }
+            source: {document: 0, path: 0, type: "documentValue"}
           },
           "$['tags'][1]" => {
             type: "value",
-            source: { document: 0, path: 1, type: "documentValue" }
+            source: {document: 0, path: 1, type: "documentValue"}
           }
         }
       }
