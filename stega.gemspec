@@ -7,16 +7,16 @@ Gem::Specification.new do |s|
   s.version = Stega::VERSION
   s.authors = ["Theodor Tonum"]
   s.email = ["theodor@tonum.no"]
-  s.homepage = "https://github.com/rorkjop/stega"
+  s.homepage = "https://github.com/Skalar/stega"
   s.summary = "Steganographic encoding and decoding for strings"
   s.description = "A Ruby implementation of Vercel's stega encoding for embedding invisible data in strings, with Sanity source map support."
 
   s.metadata = {
-    "bug_tracker_uri" => "https://github.com/rorkjop/stega/issues",
-    "changelog_uri" => "https://github.com/rorkjop/stega/blob/main/CHANGELOG.md",
-    "documentation_uri" => "https://github.com/rorkjop/stega",
-    "homepage_uri" => "https://github.com/rorkjop/stega",
-    "source_code_uri" => "https://github.com/rorkjop/stega",
+    "bug_tracker_uri" => "https://github.com/Skalar/stega/issues",
+    "changelog_uri" => "https://github.com/Skalar/stega/blob/main/CHANGELOG.md",
+    "documentation_uri" => "https://github.com/Skalar/stega",
+    "homepage_uri" => "https://github.com/Skalar/stega",
+    "source_code_uri" => "https://github.com/Skalar/stega",
     "rubygems_mfa_required" => "true"
   }
 
