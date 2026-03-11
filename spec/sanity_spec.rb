@@ -242,6 +242,7 @@ RSpec.describe Stega::Sanity do
             "_ref" => "ref-1",
             "_key" => "key-1",
             "slug" => {"current" => "about"},
+            "marks" => ["strong"],
             "title" => "About Us"
           }
         end
@@ -256,7 +257,7 @@ RSpec.describe Stega::Sanity do
         end
         let(:encoded) { Stega::Sanity.encode_source_map(result, source_map, config) }
 
-        {"_id" => "doc-1", "_type" => "page", "_ref" => "ref-1", "_key" => "key-1", "slug" => {"current" => "about"}}.each do |key, value|
+        {"_id" => "doc-1", "_type" => "page", "_ref" => "ref-1", "_key" => "key-1", "slug" => {"current" => "about"}, "marks" => ["strong"]}.each do |key, value|
           it "does not encode #{key}" do
             expect(encoded[key]).to eq(value)
           end

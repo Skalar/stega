@@ -4,7 +4,7 @@ require "set"
 
 module Stega
   module Sanity
-    SKIP_KEYS = Set.new(%w[_id _type _ref _key _createdAt _updatedAt _rev _originalId _system slug]).freeze
+    SKIP_KEYS = Set.new(%w[_id _type _ref _key _createdAt _updatedAt _rev _originalId _system slug marks]).freeze
 
     class << self
       def encode_source_map(result, source_map, config)
