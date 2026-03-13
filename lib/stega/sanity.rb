@@ -102,7 +102,7 @@ module Stega
         ]
         router_params = router_parts.join(";")
 
-        search_hash = {baseUrl: studio_url, id: doc_id, type: doc_type, path: studio_path, perspective: "previewDrafts"}
+        search_hash = {baseUrl: studio_url, id: doc_id, type: doc_type, path: studio_path}
         unless omit_cross_dataset
           search_hash[:projectId] = project_id if project_id
           search_hash[:dataset] = dataset if dataset

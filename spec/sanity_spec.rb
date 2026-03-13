@@ -398,7 +398,7 @@ RSpec.describe Stega::Sanity do
         expect(decoded["href"]).to include("doc1")
       end
 
-      it "includes perspective and baseUrl in edit URL query params" do
+      it "includes baseUrl in edit URL query params" do
         result = {"title" => "Hello"}
         source_map = {
           documents: [{_id: "doc-1", _type: "page"}],
@@ -414,7 +414,6 @@ RSpec.describe Stega::Sanity do
         uri = URI.parse(decoded["href"])
         params = URI.decode_www_form(uri.query).to_h
 
-        expect(params["perspective"]).to eq("previewDrafts")
         expect(params["baseUrl"]).to eq("http://studio.test")
       end
 
