@@ -6,6 +6,6 @@
   "author": "Theodor Tonum <theodor@tonum.no>",
   "license": "MIT",
   "dependencies": {
-    "@sanity/client": "^7.16.0"
+    "@sanity/client": "^7.22.1"
   }
 }
